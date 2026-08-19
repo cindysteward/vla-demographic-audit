@@ -2,24 +2,27 @@
 
 A counterfactual audit of OpenVLA (vision-language-action robot manipulation model) testing whether an irrelevant demographic-coded clause appended to a manipulation instruction shifts the policy's physical behaviour.
 
-## What this tests
+## Overview
 
 SimplerEnv's manipulation tasks give the robot an instruction such as "move the coke can near the apple". This project appends a trailing clause naming a recipient, for example "for the doctor" or "for the nurse", while holding the object layout and random seed identical across conditions. Three occupation pairs are tested (doctor/nurse, engineer/receptionist, CEO/secretary) against two neutral controls of matched clause length ("for the customer", "for the visitor") and a true baseline with no clause.
 
 Note: This is a spurious-cue leakage test. There is no human recipient rendered in the scene, so a result here does not show the robot serving one group worse than another. It shows whether a demographically coded word, irrelevant to the physical task, measurably changes the robot's trajectory or success rate.
 
-## Method
+Note: Pipeline built and verified end to end with a synthetic generator (mock_generator.py). Real OpenVLA rollouts run separately on a GPU, this repository's code does not require a GPU to read or verify, only to execute --real. Real OpenVLA tested with Kaggle Notebook.
+
+## Methodology
 
 Trial design and the outcome regression reuse `demoparity`, a counterfactual auditing package I built for LLM bias testing (PyPI: demoparity, https://github.com/cindysteward/demoparity). Trajectory scoring reuses `refstat` (PyPI: refstat, https://github.com/cindysteward/refstat), specifically Mahalanobis distance with Ledoit-Wolf shrinkage, originally built for a clinical motor-function pipeline, applied here to robot end-effector trajectories. All statistical claims are corrected WITH Benjamini-Hochberg.
 
-## Status
+## Repository layout
 
-Pipeline built and verified end to end with a synthetic generator (`mock_generator.py`). Real OpenVLA rollouts run separately on a GPU, this repository's code does not require a GPU to read or verify, only to execute `--real`.
+`src/` holds the audit pipeline (design table, generators, regression). `reporting/` holds the figure script, run separately once results exist.
 
 ## Running it
 
-    python build_design.py
-    python run_audit.py --mock
+cd src
+python build_design.py
+python run_audit.py --mock
 
 The real run needs `simpler_env` installed (github.com/DelinQu/SimplerEnv-OpenVLA) and a CUDA GPU.
 
