@@ -78,7 +78,8 @@ def main():
         from vla_generator import make_generator
     generator = make_generator()
 
-    results = demoparity.run_design(design, generator, concurrency=1, checkpoint_path="./checkpoint.jsonl")
+    checkpoint_path = "./checkpoint_mock.jsonl" if args.mock else "./checkpoint_real.jsonl"
+    results = demoparity.run_design(design, generator, concurrency=1, checkpoint_path=checkpoint_path)
     df = parse_responses(results)
     df = score_trajectories(df)
     df.to_csv("./audit_results.csv", index=False)
